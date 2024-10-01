@@ -28,48 +28,49 @@ on:
     - cron: '0 2 * * *'
   # Enable manual runs for testing or manually (re-)creating a nightly release.
   workflow_dispatch:
+  pull_request:
 
 permissions:
   contents: write # For creating and uploading to releases.
 
 jobs:
   release:
-    runs-on: ubuntu-22.04
+    runs-on: macos-latest
     steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
-        with:
-          egress-policy: block
-          # When adding endpoints, see README.md.
-          # prettier-ignore
-          allowed-endpoints: >
-            *.dl.sourceforge.net:443
-            api.github.com:443
-            bcr.bazel.build:443
-            downloads.sourceforge.net:443
-            github.com:443
-            oauth2.googleapis.com:443
-            objects.githubusercontent.com:443
-            releases.bazel.build:443
-            sourceforge.net:443
-            storage.googleapis.com:443
-            uploads.github.com:443
+      # - name: Harden Runner
+      #   uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
+      #   with:
+      #     egress-policy: block
+      #     # When adding endpoints, see README.md.
+      #     # prettier-ignore
+      #     allowed-endpoints: >
+      #       *.dl.sourceforge.net:443
+      #       api.github.com:443
+      #       bcr.bazel.build:443
+      #       downloads.sourceforge.net:443
+      #       github.com:443
+      #       oauth2.googleapis.com:443
+      #       objects.githubusercontent.com:443
+      #       releases.bazel.build:443
+      #       sourceforge.net:443
+      #       storage.googleapis.com:443
+      #       uploads.github.com:443
 
       - name: Checkout branch
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-      - name: Set up remote cache access
-        env:
-          REMOTE_CACHE_KEY: ${{ secrets.CARBON_BUILDS_GITHUB }}
-        run: |
-          echo "$REMOTE_CACHE_KEY" | base64 -d > $HOME/remote_cache_key.json
-          echo "remote_cache_upload=--google_credentials=$HOME/remote_cache_key.json" \
-              >> $GITHUB_ENV
+      # - name: Set up remote cache access
+      #   env:
+      #     REMOTE_CACHE_KEY: ${{ secrets.CARBON_BUILDS_GITHUB }}
+      #   run: |
+      #     echo "$REMOTE_CACHE_KEY" | base64 -d > $HOME/remote_cache_key.json
+      #     echo "remote_cache_upload=--google_credentials=$HOME/remote_cache_key.json" \
+      #         >> $GITHUB_ENV
 
       - uses: ./.github/actions/build-setup-common
         with:
-          matrix_runner: ubuntu-22.04
-          remote_cache_upload: ${{ env.remote_cache_upload }}
+          matrix_runner: macos-latest
+          # remote_cache_upload: ${{ env.remote_cache_upload }}
 
       - name: Get nightly date
         run: |
